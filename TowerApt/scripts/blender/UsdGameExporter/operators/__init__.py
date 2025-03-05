@@ -11,6 +11,7 @@ def register():
     for cls in vp_out:
         bpy.utils.register_class(cls)
 
+
 def unregister():
     for cls in exp_out:
         bpy.utils.unregister_class(cls)

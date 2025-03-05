@@ -41,9 +41,6 @@ class VIEW3D_PT_usdgeexport_panel(Panel):
 
         if (debug):
             root.prop(context.window_manager.USDGEState, "run_hooks")
-            # root.prop(active_collection, "exporters")
-            # stuff = "{}".format(*dir(active_collection.exporters))
-            # root.label(text="hello world again and again and again")
         
         box = root.box()
         
@@ -62,12 +59,12 @@ class VIEW3D_PT_usdgeexport_panel(Panel):
                 "name",
                 text="Data Block Name"
             )
-        bcol.separator()
-        bcol.prop(
-            active_obj.USDGE,
-            "status"
-        )
-
+        #  Deprecated after workflow change     
+        # bcol.separator()
+        # bcol.prop(
+        #     active_obj.USDGE,
+        #     "status"
+        # )
 
         if active_obj.USDGE.status != "EXCLUDE":
             box = root.box()
@@ -85,26 +82,27 @@ class VIEW3D_PT_usdgeexport_panel(Panel):
             active_obj.USDGE,
             "purpose"
         )
-        bcol.prop(
-            active_obj.USDGE,
-            "flatten"
-        )
 
-        bcol.separator()
-        bcol.prop(
-            active_obj.USDGE,
-            "auto_exclude_pattern"
-        )
+        #  Deprecated after workflow change
+        # bcol.prop(
+        #     active_obj.USDGE,
+        #     "flatten"
+        # )
 
-        bcol.separator()
-        bcol.prop(
-            active_obj.USDGE,
-            "auto_exclude_types"
-        )
+        # bcol.separator()
+        # bcol.prop(
+        #     active_obj.USDGE,
+        #     "auto_exclude_pattern"
+        # )
 
+        # bcol.separator()
+        # bcol.prop(
+        #     active_obj.USDGE,
+        #     "auto_exclude_types"
+        # )
 
-        # Currently the default exporter
-        root.operator("USDGE.export")
+        # TODO: Replace with task-specific exporters — Export Layout, Export Props, Export Assemblies, etc.
+        # root.operator("USDGE.export")
 
 # bpy.data.meshes["Cube"].name
 OUT = [

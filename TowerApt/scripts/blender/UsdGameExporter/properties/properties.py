@@ -41,6 +41,7 @@ class USDGEExportCollectionProps(PropertyGroup):
 
 
 class USDGEExportObjectProps(PropertyGroup):
+
     status: bpy.props.EnumProperty(
         name="Export Status",
         description="How the exporter will treat this object",
@@ -89,27 +90,30 @@ class USDGEExportObjectProps(PropertyGroup):
         options={'SKIP_SAVE'}
     ) # type: ignore
 
-    flatten: bpy.props.BoolProperty(
-        name="Flatten Object Transform",
-        description="Flatten the object transform onto the object data block in the USD hierarchy",
-        default=True,
-        options={'SKIP_SAVE'}
-    ) # type: ignore
+    # Deprecated
+    # flatten: bpy.props.BoolProperty(
+    #     name="Flatten Object Transform",
+    #     description="Flatten the object transform onto the object data block in the USD hierarchy",
+    #     default=True,
+    #     options={'SKIP_SAVE'}
+    # ) # type: ignore
 
+    # Deprecated
     # Probably a bad idea
-    swizzle_as_layer: bpy.props.BoolProperty(
-        name="Apply Swizzle As Layer",
-        description="Apply the swizzle transform as a separate layer",
-        default=False,
-        options={'SKIP_SAVE'}
-    ) # type: ignore
+    # swizzle_as_layer: bpy.props.BoolProperty(
+    #     name="Apply Swizzle As Layer",
+    #     description="Apply the swizzle transform as a separate layer",
+    #     default=False,
+    #     options={'SKIP_SAVE'}
+    # ) # type: ignore
 
-    auto_exclude_pattern: bpy.props.StringProperty(
-        name="Auto-Exclude Pattern",
-        description="Regex pattern for automatically excluding children by name",
-        default="CUTTER",
-        options={'SKIP_SAVE'}
-    ) # type: ignore
+    # Deprecated
+    # auto_exclude_pattern: bpy.props.StringProperty(
+    #     name="Auto-Exclude Pattern",
+    #     description="Regex pattern for automatically excluding children by name",
+    #     default="CUTTER",
+    #     options={'SKIP_SAVE'}
+    # ) # type: ignore
 
     auto_exclude_types: bpy.props.EnumProperty(
         name="Auto-Exclude Types",
@@ -124,28 +128,30 @@ class USDGEExportObjectProps(PropertyGroup):
         options={ 'ENUM_FLAG'}
     ) # type: ignore
 
-    name_override: bpy.props.StringProperty(
-        name="Name Override",
-        description="Optional name override, use to circumvent Blender's lack of namespacing",
-        default="",
-        options={'SKIP_SAVE'}
-    ) # type: ignore
+    # Deprecated
+    # name_override: bpy.props.StringProperty(
+    #     name="Name Override",
+    #     description="Optional name override, use to circumvent Blender's lack of namespacing",
+    #     default="",
+    #     options={'SKIP_SAVE'}
+    # ) # type: ignore
 
-    path_override: bpy.props.StringProperty(
-        name="Path Override",
-        description="Optional path override, use to manually position the object in the USD hierarchy",
-        default="",
-        options={'SKIP_SAVE'}
-    ) # type: ignore
+    # Deprecated
+    # path_override: bpy.props.StringProperty(
+    #     name="Path Override",
+    #     description="Optional path override, use to manually position the object in the USD hierarchy",
+    #     default="",
+    #     options={'SKIP_SAVE'}
+    # ) # type: ignore
 
-
-class USDGEExportFileProps(PropertyGroup):
-    split: bpy.props.BoolProperty(
-        name="Split Components",
-        description="Export Components as separate files",
-        default=False,
-        options={'SKIP_SAVE'}
-    ) # type: ignore
+# Deprecated
+# class USDGEExportFileProps(PropertyGroup):
+#     split: bpy.props.BoolProperty(
+#         name="Split Components",
+#         description="Export Components as separate files",
+#         default=False,
+#         options={'SKIP_SAVE'}
+#     ) # type: ignore
 
 
 class USDGEExportStateProps(PropertyGroup):

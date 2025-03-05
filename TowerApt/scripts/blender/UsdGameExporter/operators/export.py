@@ -1,6 +1,9 @@
 import bpy
 from bpy_extras.io_utils import ExportHelper
 
+# Originally started as a per-actor partout exporter that didn't leverage the Collection Export workflow.
+# Was abandoned after moving to multi-scene collection exporting. 
+
 
 # TODO: Implement name and type filtering here
 def recursively_select_children(obj):
@@ -219,6 +222,6 @@ class USDGE_FH_usd_export(bpy.types.FileHandler):
 
 
 OUT = [
-    USDGE_OT_Export,
-    USDGE_FH_usd_export
+    # USDGE_OT_Export,
+    # USDGE_FH_usd_export
 ]
