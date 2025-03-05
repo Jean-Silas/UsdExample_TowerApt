@@ -1,0 +1,25 @@
+# Blender Temporary Files
+**/*.blend?
+**/*.blend??
+**/*.blend???
+
+# PureRef 
+**/*.pur
+
+TowerApt/src/**
+TowerApt/src/tex/*
+!TowerApt/src/tex
+!TowerApt/src/tex/.keep
+!TowerApt/src/TowerApt-Source.blend
+
+
+
+TowerApt/usd/**
+!TowerApt/usd
+!TowerApt/usd/.keep
+!TowerApt/usd/monolithic
+!TowerApt/usd/monolithic/.keep
+
+!TowerApt/scripts/blender/extensions/UsdGameExporter/*
+
+

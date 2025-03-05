@@ -1,0 +1,1 @@
+# USD Game Exporter: Tools for handling game-focused USD Data in Blender
