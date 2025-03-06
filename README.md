@@ -28,3 +28,11 @@ License files are loosely co-located with the content they cover, but the overal
 
 In short: Please steal.
 
+## Getting Started: The Lazy Way
+
+1. Use [Blender VSCode](https://github.com/JacquesLucke/blender_vscode) to symlink the Blender Extension in `TowerApt/scripts/blender/UsdGameExporter` into your Blender add-on directory and launch a debug session.
+2. Run `TowerApt/scripts/pull_textures.py` to download the textures from object storage. It will take a while, I'm hosting them cheaply.
+3. Open `TowerApt/src/TowerApt-Source.blend`
+4. Check the 'run hooks' checkbox in the `USD GE` viewport panel.
+5. Run the USD collection exporter attached to the `TowerAppt` collection.
+6. Verify the output in `TowerApt/usd/monolithic/`
