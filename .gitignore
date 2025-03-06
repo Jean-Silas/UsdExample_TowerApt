@@ -11,7 +11,7 @@ TowerApt/src/tex/*
 !TowerApt/src/tex
 !TowerApt/src/tex/.keep
 !TowerApt/src/TowerApt-Source.blend
-
+!TowerApt/src/texture_catalog.json
 
 
 TowerApt/usd/**
