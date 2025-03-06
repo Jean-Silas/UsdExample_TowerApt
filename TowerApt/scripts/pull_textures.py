@@ -1,3 +1,5 @@
+# CC0 — Please Steal
+
 import urllib
 import urllib.request
 import pathlib

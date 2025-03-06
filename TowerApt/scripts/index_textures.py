@@ -1,3 +1,5 @@
+# CC0 — Please Steal
+
 import os
 import pathlib
 import json
