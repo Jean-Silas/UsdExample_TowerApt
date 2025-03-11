@@ -1,6 +1,8 @@
 import bpy
 from bpy.types import WorkSpaceTool
 
+
+
 class USDSelectionTool(WorkSpaceTool):
     bl_space_type = 'VIEW_3D'
     bl_context_mode = 'OBJECT'
@@ -15,13 +17,17 @@ class USDSelectionTool(WorkSpaceTool):
     bl_options = {'KEYMAP_FALLBACK'}
 
     bl_keymap = (
-        ("USDGE.select_by_kind", {"type": 'LEFTMOUSE', "value": 'CLICK'}, None),
+        ("USDGE.select_by_kind", {"type": 'LEFTMOUSE', "value": 'CLICK', "ctrl": True}, None),
+        ("usdge.selection_pie", {"type": 'LEFTMOUSE', "value": 'CLICK_DRAG', "alt": True}, None)
         # ("transform.translate", {"type": 'RIGHTMOUSE', "value": 'PRESS'}, None),
     )
 
     def draw_settings(context, layout, tool):
         props = tool.operator_properties("USDGE.select_by_kind")
-        layout.prop(props, "kind")
-        layout.prop(props, "mode")
-        layout.prop(props, "select_untagged")
+        layout.prop(props, "mode", text="Mode")
+
+        if props.mode != 'PRIM':
+            layout.prop(props, "kind", text="Kind")
+        
+            layout.prop(props, "select_untagged")
         
