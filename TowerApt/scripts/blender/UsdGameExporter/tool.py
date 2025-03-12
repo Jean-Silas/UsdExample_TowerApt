@@ -24,10 +24,4 @@ class USDSelectionTool(WorkSpaceTool):
 
     def draw_settings(context, layout, tool):
         props = tool.operator_properties("USDGE.select_by_kind")
-        layout.prop(props, "mode", text="Mode")
-
-        if props.mode != 'PRIM':
-            layout.prop(props, "kind", text="Kind")
-        
-            layout.prop(props, "select_untagged")
-        
+        layout.prop(props, "kind", text="Kind")

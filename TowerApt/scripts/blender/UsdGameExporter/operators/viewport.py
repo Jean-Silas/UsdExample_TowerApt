@@ -1,80 +1,59 @@
 import bpy
 import numpy
+from collections import namedtuple
+from typing import NamedTuple
 
+# Expressing USD Kinds as a subset of a broader system comprised of three ints
+# and a conceptual compromise:
+# 
+# 1. Model kinds are linearized to a 3bit integer axis.
+# 2. Subcomponents are simply the first element in a second 3bit integer axis.
+# 3. Additional information on encapsulation/unrolling can be stored in a third 
+#    2-bit integer.
+# 
+# There isn't a good set of names for the two axes here, I could call them kiki
+# and bouba and the meaning would be the same. 
+# 
+# The first axis describes a kind of height -- an assembly is tall, a group is 
+# shorter, a component is shortest. In a gaming context, it might make sense to
+# have an Entity kind on this axis as well. This height could also be seen as a
+# form of concrete-ness.
+# 
+# The second axis describes a kind of roughness. A subcomponent is rougher than
+# anything that isn't a subcomponent, but smoother than things farther along
+# the axis.
+# 
+# I realize that none of this makes sense.
 
-def compare_kind(kind_a: str, kind_b: str) -> int:
-    kind_weights = {
-        'ASSEMBLY': 4,
-        'GROUP': 3,
-        'COMPONENT': 2,
-        'SUBCOMPONENT': 1,
-        'NOKIND': 0
-    }
-    return numpy.sign(kind_weights[kind_a] - kind_weights[kind_b]) 
-
-
-def extend_selection_to_parents(context: bpy.types.Context, obj: bpy.types.Object, kind: str, mode: str, select_untagged: bool):
-    if obj.parent:
-        
-        comparison = compare_kind(kind, obj.parent.USDGE.kind)
-        #  print(f"Object: {obj.name} | Parent: {obj.parent.name} | Comparison: {comparison}")
-        match comparison:
-            case -1:
-                extend_selection_to_children(context, obj, kind, mode, select_untagged)
-                # match mode:
-                #     case 'MODEL_IMMEDIATE':
-                #         ...
-                #     case 'MODEL_IMMEDIATE_SATURATE':
-                #         extend_selection_to_children(obj.parent, kind, mode, select_untagged)
-                #     case _:
-                #         extend_selection_to_parents(obj.parent, kind, mode, select_untagged)
-                #         ...
-            case 0:
-                obj.parent.select_set(True)
-                match mode:
-                    case 'MODEL_IMMEDIATE':
-                        ...
-                    case 'MODEL_IMMEDIATE_SATURATE':
-                        # print(f"Current Object: {obj.name} | Parent: {obj.parent.name} | Selecting Children")
-                        extend_selection_to_children(context, obj.parent, kind, mode, select_untagged)
-                    case _:
-                        extend_selection_to_parents(context, obj.parent, kind, mode, select_untagged)
-                        ...
-            case 1:
-                obj.parent.select_set(True)
-                extend_selection_to_parents(context, obj.parent, kind, mode, select_untagged)
-            case _:
-                print(f"Impossible math: {comparison}")
-    else:
-        # extend_selection_to_children(obj, kind, mode, select_untagged)a
-        ...
-
-    if context.space_data.local_view != None:
-        obj.local_view_set(context.space_data, True)
-
-def extend_selection_to_children(context: bpy.types.Context, obj: bpy.types.Object, kind: str, mode:str, select_untagged: bool):
-    if obj == None:
-        return
-    for child in obj.children:
-        if select_untagged == False and child.USDGE.kind == 'NOKIND':
-            continue
-
-        comparison = compare_kind(kind, child.USDGE.kind)
-        # print(f"Descending: {obj.name} {child.name}:  {comparison}")
-        match comparison:
-            case -1:
-                continue
-            case 0:
-                child.select_set(True)
-                extend_selection_to_children(context, child, kind, mode, select_untagged)
-            case 1:
-                child.select_set(True)
-                extend_selection_to_children(context, child, kind, mode, select_untagged)
-            case _:
-                print(f"Impossible math: {comparison}")
+class ObjectKind(NamedTuple):
+    flag: int   # encapsulation flags
+    model_axis: int
+    entity_axis: int
     
-    if context.space_data.local_view != None:
-        obj.local_view_set(context.space_data, True)
+    def __lt__(self, other):
+        # print(f"{self.model_axis} | {other.model_axis}")
+        return ObjectKind(
+            numpy.sign(self.flag - other.flag),
+            numpy.sign(self.model_axis - other.model_axis),
+            numpy.sign(self.entity_axis - other.entity_axis)
+        )
+
+KindMap = {
+    'NOKIND':        ObjectKind(0b00, 0b000, 0b000),
+
+    # Yes, these two are identical; we're going to cheat with math.
+    'MODEL':         ObjectKind(0b00, 0b001, 0b000),
+    'COMPONENT':     ObjectKind(0b00, 0b001, 0b000),
+
+    'GROUP':         ObjectKind(0b00, 0b010, 0b000),
+    'ASSEMBLY':      ObjectKind(0b00, 0b011, 0b000),
+    
+    'SUBCOMPONENT':  ObjectKind(0b00, 0b000, 0b001),
+}
+
+def compare_kind(kind_a_name:str, kind_b_name):
+    return KindMap[kind_a_name] < KindMap[kind_b_name]
+
 
 # Building a selection hierarchy around Model Kinds reveals some interesting issues with the hierarchy as-implemented
 # TL;DR: Everything becomes an assembly.
@@ -92,25 +71,6 @@ class USDGE_OT_SelectByKind(bpy.types.Operator):
             ('ASSEMBLY', "Assembly", "A group that defines a Primary Asset", 'NONE', 2),
             ('GROUP', "Group", "A generic group", 'NONE', 3),
             ('COMPONENT', "Component", "a 'leaf model' that can contain no other models", 'NONE', 4),
-            ('SUBCOMPONENT', "Subcomponent", "An important part of a component", 'NONE', 5),
-        ]
-    ) # type: ignore
-
-    select_untagged: bpy.props.BoolProperty(
-        name="Select Untagged",
-        description="Include objects that do not have a model kind",
-        default=False
-    ) # type: ignore
-
-
-    mode: bpy.props.EnumProperty(
-        name="Selection Mode",
-        description="The Kind of the object in the USD hierarchy",
-        items = [
-            ('PRIM', "Primitives", "Select individual primitives", 'NONE', 1),
-            ('MODEL', "Models", "Select the full hierarchy bound by the model kind", 'NONE', 2),
-            ('MODEL_IMMEDIATE', "Immediate Models", "Select the immediate hierarchy bound by the model kind", 'NONE', 3),
-            ('MODEL_IMMEDIATE_SATURATE', "Saturate Models", "Select the immediate hierarchy bound by the model kind", 'NONE', 4),
         ]
     ) # type: ignore
     
@@ -136,16 +96,41 @@ class USDGE_OT_SelectByKind(bpy.types.Operator):
 
         # print(f"Click Location: {location} | Raw: {(event.mouse_region_x, event.mouse_region_y)}")
         bpy.ops.view3d.select('EXEC_DEFAULT', True, extend=False, location=location)
-        if self.mode != 'PRIM':
-            return self.execute(context)
-        return {'FINISHED'}
+        return self.execute(context)
         
        
     def execute(self, context):
+        def traverse_upwards(obj: bpy.types.Object, kind: str):
+            comparison = compare_kind(kind, obj.USDGE.kind)
+            # print(f"Comparison for {obj.name}: {comparison.model_axis}")
+            match comparison.model_axis:
+                case -1:
+                    obj.select_set(True)
+                    # print(f"-1: Traversing Downwards from {obj.name}")
+                    traverse_downwards(obj)
+                    ...
+                case 0:
+                    obj.select_set(True)
+                    # print(f"0: Traversing Downwards from {obj.name}")
+                    traverse_downwards(obj)
+                case 1:
+                    obj.select_set(True)
+                    # print(f"1: Traversing Upwards from {obj.name}")
+                    if obj.parent != None: 
+                        traverse_upwards(obj.parent, kind)
+
+
+        def traverse_downwards(obj: bpy.types.Object):
+            for child in obj.children:
+                child.select_set(True)
+                traverse_downwards(child)
+
+
         for obj in context.selected_objects:
-            # extend_selection_to_children(obj, self.kind)
-            extend_selection_to_parents(context, obj, self.kind, self.mode, self.select_untagged)
+            traverse_upwards(obj, self.kind)
+
         return {'FINISHED'}
+
 
 class USDGE_OT_SelectionPie(bpy.types.Operator):
     bl_idname = "usdge.selection_pie"
@@ -183,8 +168,6 @@ class USDGE_OT_SelectionPie(bpy.types.Operator):
             op.override_click_location = True
             op.click_location = mouse_loc
             op.kind = tool_props.kind
-            op.select_untagged = tool_props.select_untagged
-            op.mode = tool_props.mode
 
             # TOP
             pie.operator_context = 'EXEC_DEFAULT'
