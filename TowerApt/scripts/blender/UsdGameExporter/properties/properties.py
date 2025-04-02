@@ -78,14 +78,44 @@ class USDGEExportObjectProps(PropertyGroup):
         options={'SKIP_SAVE'}
     ) # type: ignore
 
+    # Inspired by https://docs.omniverse.nvidia.com/usd/latest/learn-openusd/independent/asset-structure-principles.html#annotated-asset-structures
+    # Assemblies seem to be where studios like to express structural sub-kinds
+    assembly_subkind: bpy.props.EnumProperty(
+        name="Assembly Subkind",
+        description="The rendering role of the object in the USD hierarchy",
+        items = [
+            ('NONE', "None", "Just an assembly", 'NONE', 1),
+            # https://docs.omniverse.nvidia.com/usd/latest/learn-openusd/independent/asset-structure-principles.html#atomic-model-structure-flowerpot
+            ('ATOMIC', "Atomic", "An assembly with no external dependencies", 'NONE', 2),
+            # https://docs.omniverse.nvidia.com/usd/latest/learn-openusd/independent/asset-structure-principles.html#package-model-structure-apartmentbuilding-pkg
+            ('BUNDLE', "Bundle", "An assembly 'adorned' with additional imagable prims", 'NONE', 3),
+            # https://docs.omniverse.nvidia.com/usd/latest/learn-openusd/independent/asset-structure-principles.html#aggregate-model-structure-neighborhood
+            ('AGGREGATE', "Aggregate", "A 'pure' assembly ", 'NONE', 4),
+
+        ],
+        options={'SKIP_SAVE'}
+    ) # type: ignore
+
     purpose: bpy.props.EnumProperty(
-        name="Model Purpose",
+        name="Purpose",
         description="The rendering role of the object in the USD hierarchy",
         items = [
             ('INHERIT', "Inherit", "Inherit purpose from parent", 'NONE', 1),
             ('RENDER', "Render", "High quality render mesh", 'NONE', 2),
             ('PROXY', "Proxy", "Low quality preview mesh", 'NONE', 3),
             ('GUIDE', "Guide", "Editor-only visualization mesh", 'NONE', 4)
+        ],
+        options={'SKIP_SAVE'}
+    ) # type: ignore
+
+    convert_to: bpy.props.EnumProperty(
+        name="Convert To",
+        description="The prim type to convert this object into after export",
+        items = [
+            ('NONE', "None", "Do not convert", 'NONE', 1),
+            ('SCOPE', "Scope", "Convert prim to scope after export", 'NONE', 2),
+            ('SOCKET', "Constraint Target", "Prune the prim and convert its transform into a constraint target on its parent", 'NONE', 3),
+            ('SUBSET', "Geometry Subset", "Merge with siblings and convert to GeomSubset", 'NONE', 2),
         ],
         options={'SKIP_SAVE'}
     ) # type: ignore

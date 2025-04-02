@@ -78,9 +78,17 @@ class VIEW3D_PT_usdgeexport_panel(Panel):
             active_obj.USDGE,
             "kind"
         )
+        if active_obj.USDGE.kind == 'ASSEMBLY':
+            bcol.prop(active_obj.USDGE, "assembly_subkind")
         bcol.prop(
             active_obj.USDGE,
             "purpose"
+        )
+        bcol.separator()
+
+        bcol.prop(
+            active_obj.USDGE,
+            "convert_to"
         )
 
         #  Deprecated after workflow change
